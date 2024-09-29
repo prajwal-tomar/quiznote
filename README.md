@@ -1,97 +1,144 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+**PRD: QuizNote -- Interactive Test Generation Platform**
+========================================================
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+**TL;DR**
+---------
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+QuizNote is a web platform where users can upload their notes on any subject, and the system will generate an interactive AI-driven test based on the notes. The test evaluates the user's knowledge, providing immediate feedback and grading to help them identify their strengths and areas for improvement.
 
-## Features
+* * * * *
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+**Goals**
+---------
 
-## Demo
+### **User Goals**
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+-   Make it easy for users to assess their knowledge by uploading study notes and receiving personalized tests.
+-   Provide users with immediate, actionable feedback on their learning performance.
+-   Allow users to track their progress over time and improve continuously.
 
-## Deploy to Vercel
+### **Non-Goals**
 
-Vercel deployment will guide you through creating a Supabase account and project.
+-   Not a platform for offering full lessons or tutorials. It strictly focuses on testing and feedback.
+-   No social or collaborative features (for the initial launch).
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+* * * * *
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+**User Stories**
+----------------
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+-   **As a student**, I want to upload my class notes and get a quiz generated from them, so I can quickly assess my knowledge.
+-   **As a professional**, I want to prepare for certifications by uploading my study material and receiving personalized practice questions.
+-   **As a user**, I want to receive instant feedback on my quiz performance, so I can see where I need to improve.
+-   **As a user**, I want to track my progress over time, so I can visualize my improvement and adjust my study focus accordingly.
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+* * * * *
 
-## Clone and run locally
+**User Experience (Flow)**
+--------------------------
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 1\. **User Uploads Notes**
 
-2. Create a Next.js app using the Supabase Starter template npx command
+-   User uploads their notes in supported file formats (PDF, DOCX, TXT).
+-   Optional tags (e.g., "Biology," "Chapter 5") can be added for more focused quiz generation.
 
-   ```bash
-   npx create-next-app -e with-supabase
-   ```
+### 2\. **AI Test Generation**
 
-3. Use `cd` to change into the app's directory
+-   The OpenAI API processes the notes and generates a customized quiz with questions (multiple-choice, short-answer, true/false) based on the uploaded content.
+-   Optional pre-test flashcards may be generated to help users review before the quiz.
 
-   ```bash
-   cd name-of-new-app
-   ```
+### 3\. **Interactive Test**
 
-4. Rename `.env.example` to `.env.local` and update the following:
+-   Users take the quiz, either in timed or untimed mode.
+-   Users receive immediate feedback on each answer, highlighting correct or incorrect responses and providing explanations where applicable.
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+### 4\. **Results & Feedback**
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+-   QuizNote provides a detailed score breakdown by topic.
+-   Users receive actionable feedback on their weak areas, with suggestions for additional study material.
+-   Users can save their results and compare them over time.
 
-5. You can now run the Next.js local development server:
+### 5\. **Progress Tracking**
 
-   ```bash
-   npm run dev
-   ```
+-   Users can view past quizzes and track their performance using graphs and data visualizations.
+-   Progress reports help users identify their learning trends and weak spots over multiple quizzes.
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+* * * * *
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+**Narrative**
+-------------
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+Imagine a student preparing for finals who has been diligently taking notes but is unsure how well they've retained the material. Instead of using generic online quizzes, they upload their own notes to QuizNote. Within seconds, the platform generates a personalized quiz, providing real-time feedback and pinpointing areas that need more attention. This saves time, provides more relevant insights, and boosts confidence for the upcoming exam. QuizNote transforms passive note-taking into an active, personalized learning experience.
 
-## Feedback and issues
+* * * * *
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+**Success Metrics**
+-------------------
 
-## More Supabase examples
+-   **User Acquisition**: Number of new users signing up.
+-   **Engagement**: Number of quizzes generated and completed.
+-   **Conversion Rate**: Percentage of users upgrading to premium features.
+-   **Retention**: Frequency of returning users who take additional quizzes.
+-   **Feedback Quality**: User feedback on quiz accuracy and helpfulness.
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
-# quiznote
+* * * * *
+
+**Technical Considerations**
+----------------------------
+
+-   **OpenAI API Integration**: Ensure the OpenAI API can effectively process and convert user notes into quizzes. Test for accurate question generation, while managing API rate limits and usage costs.
+-   **File Handling**: Support for multiple file formats, including extracting text from PDFs and DOCX files, ensuring smooth data processing.
+-   **Question Generation**: The AI-generated questions should be high quality, covering different question types (multiple-choice, short-answer, true/false) based on the user's uploaded content.
+-   **Scalability**: Design the platform to handle large volumes of note uploads and simultaneous test generations without significant lag or downtime.
+-   **User Progress & Data**: Ensure secure storage of user data, including notes and quiz history, and create a user-friendly dashboard for tracking progress.
+
+* * * * *
+
+**Milestones & Sequencing**
+---------------------------
+
+### **XX Weeks** -- Initial Setup:
+
+-   Create the basic platform infrastructure for user registration and note uploads.
+-   Implement OpenAI API integration for quiz generation.
+
+### **XX Weeks** -- Quiz Functionality:
+
+-   Build the quiz interface, including multiple-choice, true/false, and short-answer question formats.
+-   Deploy feedback features that provide immediate grading and explanations.
+
+### **XX Weeks** -- Results & Progress Tracking:
+
+-   Develop a detailed results page with breakdowns by topic and feedback on weak areas.
+-   Implement basic data visualizations and progress tracking.
+
+### **XX Weeks** -- Premium Features:
+
+-   Add premium features such as advanced analytics, saved test progress, and customizable quizzes.
+-   Test subscription-based payment and upgrade functionality.
+
+### **XX Weeks** -- Full Launch:
+
+-   Full-scale product launch, along with marketing campaigns and user acquisition efforts.
+
+* * * * *
+
+**Potential Risks & Mitigations**
+---------------------------------
+
+-   **Question Quality**: The OpenAI-generated questions may not always match the expected difficulty or specificity. To mitigate this, continuous fine-tuning of the prompts and periodic user testing will be needed.
+-   **File Parsing Issues**: PDFs or complex DOCX files might not always parse correctly. Consider adding manual text entry or a robust file parser to improve accuracy.
+-   **User Engagement Drop-Off**: If quizzes don't provide enough value or insight, users might not return. Focus on improving feedback quality and personalization to keep users engaged.
+
+* * * * *
+
+**Open Questions**
+------------------
+
+1.  Should we introduce gamification elements like badges or leaderboards to increase engagement, or would this distract from the learning focus?
+2.  How important is it to offer various quiz formats (e.g., timed vs untimed quizzes) at launch, or can that be part of a later release?
+3.  Should we prioritize mobile responsiveness early in the development, given the target audience of students who may prefer mobile access?
+
+* * * * *
+
+This PRD provides a comprehensive roadmap for building and launching **QuizNote**, with clear goals, user flows, technical considerations, and success metrics to guide development.
