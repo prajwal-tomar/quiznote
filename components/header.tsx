@@ -3,13 +3,16 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Notebook, CheckSquare, Menu, X } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Notebook, CheckSquare, Menu, X, LogOut } from 'lucide-react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
-export function HeaderComponent() {
+export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const supabase = useSupabaseClient()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +29,19 @@ export function HeaderComponent() {
     { name: 'My Quizzes', href: '/quizzes' },
     { name: 'Profile', href: '/profile' },
   ]
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        throw error
+      }
+      router.push('/') // Redirect to home page after successful logout
+    } catch (error) {
+      console.error('Error logging out:', error)
+      // Optionally, you can show an error message to the user here
+    }
+  }
 
   return (
     <motion.header
@@ -60,9 +76,11 @@ export function HeaderComponent() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-colors text-sm"
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-colors text-sm flex items-center"
             >
-              Start Quiz
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
             </motion.button>
           </div>
           <button
@@ -97,9 +115,11 @@ export function HeaderComponent() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="mt-4 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-colors text-sm"
+              onClick={handleLogout}
+              className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full transition-colors text-sm flex items-center justify-center"
             >
-              Start Quiz
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
             </motion.button>
           </motion.div>
         )}

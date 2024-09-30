@@ -4,12 +4,6 @@ import OpenAI from 'openai';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers'
 
-// Initialize Supabase client
-// const supabase = createClient(
-//     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-//     process.env.SUPABASE_SERVICE_ROLE_KEY!
-// );
-
 // Initialize OpenAI client
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -87,7 +81,7 @@ export async function POST(request: NextRequest) {
 
         // Generate quiz questions using OpenAI
         const completion = await openai.chat.completions.create({
-            model: "gpt-4-0613",
+            model: "gpt-4o",
             messages: [
                 { role: "system", content: "You are a helpful assistant that generates multiple-choice questions based on given text." },
                 { role: "user", content: `Generate 5 multiple-choice questions based on the following text:\n\n${note.extracted_text}` }
