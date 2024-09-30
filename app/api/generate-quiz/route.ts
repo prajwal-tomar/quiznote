@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ quiz, questions: insertedQuestions });
 
     } catch (error) {
-        console.error('Error in generate-quiz:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        console.error('Error generating quiz:', error);
+        return NextResponse.json({ error: 'Failed to generate quiz', details: error.message }, { status: 500 });
     }
 }

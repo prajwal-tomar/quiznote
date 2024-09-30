@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Notebook, CheckSquare, ArrowRight } from 'lucide-react'
 import { Bar, Pie } from 'react-chartjs-2'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,34 +32,74 @@ ChartJS.register(
   LineElement
 )
 
+interface QuizResult {
+  result_id: number
+  quiz_id: number
+  user_id: string
+  score: number
+  attempt_date: string
+  time_taken: number
+  feedback: string
+}
+
 export function ResultsDashboardComponent() {
   const [activeTab, setActiveTab] = useState('results')
+  const [quizResult, setQuizResult] = useState<QuizResult | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Mock data - replace with actual quiz results
-  const overallScore = 85
-  const categoryScores = [
-    { name: 'Photosynthesis', score: 90 },
-    { name: 'Cell Respiration', score: 80 },
-  ]
-  const strengths = ['Light-dependent reactions', 'Calvin cycle']
-  const weakAreas = ['Electron transport chain', 'Krebs cycle']
-  const progressData = {
-    labels: ['Quiz 1', 'Quiz 2', 'Quiz 3', 'Quiz 4'],
-    datasets: [
-      {
-        label: 'Score',
-        data: [70, 75, 80, 85],
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
-      },
-    ],
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const resultId = searchParams.get('resultId')
+  const supabase = useSupabaseClient()
+
+  useEffect(() => {
+    const fetchQuizResult = async () => {
+      if (!resultId) {
+        setError('No result ID provided')
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('quiz_results')
+          .select('*')
+          .eq('result_id', resultId)
+          .single()
+
+        if (error) throw error
+
+        setQuizResult(data)
+        console.log(data)
+      } catch (err) {
+        console.error('Error fetching quiz result:', err)
+        setError('Failed to fetch quiz result')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchQuizResult()
+  }, [resultId, supabase])
+
+  if (isLoading) {
+    return <div className="text-center mt-8">Loading...</div>
   }
+
+  if (error) {
+    return <div className="text-center mt-8 text-red-500">{error}</div>
+  }
+
+  if (!quizResult) {
+    return <div className="text-center mt-8">No quiz result found</div>
+  }
+
   const questionBreakdownData = {
     labels: ['Correct', 'Incorrect'],
     datasets: [
       {
-        data: [85, 15],
+        data: [quizResult.score, 5 - quizResult.score],
         backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'],
         borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
         borderWidth: 1,
@@ -74,32 +116,6 @@ export function ResultsDashboardComponent() {
             <CheckSquare className="w-6 h-6 text-green-400 absolute ml-4 mt-4" />
             <span className="text-2xl font-bold">QuizNote</span>
           </Link>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setActiveTab('results')}
-              className={`text-sm transition-colors ${
-                activeTab === 'results' ? 'text-green-400' : 'hover:text-green-400'
-              }`}
-            >
-              Results
-            </button>
-            <button
-              onClick={() => setActiveTab('review')}
-              className={`text-sm transition-colors ${
-                activeTab === 'review' ? 'text-green-400' : 'hover:text-green-400'
-              }`}
-            >
-              Review Answers
-            </button>
-            <button
-              onClick={() => setActiveTab('tryAgain')}
-              className={`text-sm transition-colors ${
-                activeTab === 'tryAgain' ? 'text-green-400' : 'hover:text-green-400'
-              }`}
-            >
-              Try Again
-            </button>
-          </div>
         </nav>
       </header>
 
@@ -112,58 +128,26 @@ export function ResultsDashboardComponent() {
         >
           <h1 className="text-4xl font-bold text-center mb-8">Quiz Results</h1>
           <div className="text-center mb-8">
-            <span className="text-6xl font-bold text-green-400">{overallScore}%</span>
+            <span className="text-6xl font-bold text-green-400">{quizResult.score}/5</span>
             <p className="text-xl mt-2">Overall Score</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div>
-              <h2 className="text-2xl font-bold mb-4">Category Breakdown</h2>
-              {categoryScores.map((category, index) => (
-                <div key={index} className="mb-4">
-                  <p className="text-lg">{category.name}: {category.score}%</p>
-                  <div className="w-full h-2 bg-indigo-700 rounded-full mt-2">
-                    <div
-                      className="h-full bg-green-500 rounded-full"
-                      style={{ width: `${category.score}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+              <h2 className="text-2xl font-bold mb-4">Quiz Details</h2>
+              <p>Attempt Date: {new Date(quizResult.attempt_date).toLocaleString()}</p>
+              <p>Time Taken: {quizResult.time_taken} seconds</p>
             </div>
             <div>
-              <h2 className="text-2xl font-bold mb-4">Detailed Insights</h2>
-              <div className="mb-4">
-                <h3 className="text-xl font-semibold mb-2">Strengths</h3>
-                <ul className="list-disc list-inside">
-                  {strengths.map((strength, index) => (
-                    <li key={index}>{strength}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Areas for Improvement</h3>
-                <ul className="list-disc list-inside">
-                  {weakAreas.map((area, index) => (
-                    <li key={index}>{area}</li>
-                  ))}
-                </ul>
-              </div>
+              <h2 className="text-2xl font-bold mb-4">Feedback</h2>
+              <p>{quizResult.feedback}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Performance Over Time</h2>
-              <div className="h-64">
-                <Bar data={progressData} options={{ responsive: true, maintainAspectRatio: false }} />
-              </div>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Question Breakdown</h2>
-              <div className="h-64">
-                <Pie data={questionBreakdownData} options={{ responsive: true, maintainAspectRatio: false }} />
-              </div>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-4">Question Breakdown</h2>
+            <div className="h-64">
+              <Pie data={questionBreakdownData} options={{ responsive: true, maintainAspectRatio: false }} />
             </div>
           </div>
 
@@ -172,6 +156,7 @@ export function ResultsDashboardComponent() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center"
+              onClick={() => router.push(`/quiz?quizId=${quizResult.quiz_id}`)}
             >
               Retake Quiz <ArrowRight className="ml-2 w-5 h-5" />
             </motion.button>
@@ -179,15 +164,9 @@ export function ResultsDashboardComponent() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center"
+              onClick={() => router.push('/notes')}
             >
-              Review Answers <ArrowRight className="ml-2 w-5 h-5" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center"
-            >
-              Upload New Notes <ArrowRight className="ml-2 w-5 h-5" />
+              Back to Notes <ArrowRight className="ml-2 w-5 h-5" />
             </motion.button>
           </div>
         </motion.div>

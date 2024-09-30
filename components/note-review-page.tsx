@@ -63,25 +63,27 @@ export function NoteReviewPageComponent() {
         body: JSON.stringify({ noteId }),
       })
 
-      const responseText = await response.text();
-      console.log('Full response:', responseText);
-
       if (!response.ok) {
-        throw new Error(`Failed to generate quiz: ${responseText}`);
+        const errorText = await response.text();
+        throw new Error(`Failed to generate quiz: ${errorText}`);
       }
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (error) {
-        console.error('Error parsing JSON:', error);
-        throw new Error('Invalid JSON response from server');
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (!data.quiz.quiz_id) {
+        throw new Error('Quiz ID not found in the response');
       }
 
-      router.push(`/quiz?quizId=${data.quizId}`)
+      console.log('Navigating to quiz with ID:', data.quiz.quiz_id);
+      window.location.href = `/quiz?quizId=${data.quiz.quiz_id}`;
     } catch (error) {
       console.error('Error generating quiz:', error)
-      // Handle error (e.g., show an error message to the user)
+      let errorMessage = 'Failed to generate quiz. Please try again.'
+      if (error instanceof Error) {
+        errorMessage += ` Error: ${error.message}`
+      }
+      setError(errorMessage)
     }
   }
 

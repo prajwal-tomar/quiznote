@@ -13,7 +13,12 @@ interface Question {
   }>
 }
 
-export function QuizComponent() {
+interface QuizComponentProps {
+  quizId: string | null
+}
+
+export function QuizComponent({ quizId: initialQuizId }: QuizComponentProps) {
+  const [quizId, setQuizId] = useState<string | null>(initialQuizId);
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -26,14 +31,25 @@ export function QuizComponent() {
   const router = useRouter()
 
   const searchParams = useSearchParams()
-  const quizId = searchParams.get('quizId')
   const supabaseClient = useSupabaseClient()
 
   useEffect(() => {
+    if (!quizId) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlQuizId = searchParams.get('quizId');
+      console.log('QuizComponent - quizId from URL:', urlQuizId);
+      setQuizId(urlQuizId);
+    }
+  }, [quizId]);
+
+  useEffect(() => {
+    if (!quizId) return;  // Don't fetch if quizId is not available yet
+
     const fetchQuizQuestions = async () => {
-      console.log('Fetching quiz questions. Quiz ID:', quizId) // Debug log
+      console.log('Fetching quiz questions. Quiz ID:', quizId);  // Keep this log
 
       if (!quizId) {
+        console.log('No quizId provided to QuizComponent');  // Add this log
         setError('No quiz ID provided')
         setIsLoading(false)
         return
@@ -126,8 +142,9 @@ export function QuizComponent() {
       }
 
       const result = await response.json()
-      setQuizResult(result)
-      setQuizCompleted(true)
+      console.log(result)
+      // Redirect to the results page with the result_id
+      router.push(`/results?resultId=${result.quizResult.result_id}`)
     } catch (error) {
       console.error('Error submitting quiz:', error)
       setError('Failed to submit quiz. Please try again.')
