@@ -15,6 +15,13 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Add this interface at the top of the file, outside of any function
+interface GeneratedQuestion {
+    question: string;
+    options: string[];
+    correct_answer: string;
+}
+
 async function ensureUserExists(supabase: SupabaseClient, userId: string, email: string) {
     const { data, error } = await supabase
         .from('users')
@@ -118,18 +125,29 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to generate questions' }, { status: 500 });
         }
 
-        let generatedQuestions;
+        // Modify the parsing and type checking of generatedQuestions
+        let generatedQuestions: GeneratedQuestion[];
         try {
-            const parsedArguments = JSON.parse(completion.choices[0].message.function_call.arguments);
+            const parsedArguments = JSON.parse(completion.choices[0].message.function_call!.arguments);
             console.log('Parsed arguments:', JSON.stringify(parsedArguments, null, 2));
 
             if (!parsedArguments.questions || !Array.isArray(parsedArguments.questions)) {
                 throw new Error('Generated questions is not an array');
             }
             generatedQuestions = parsedArguments.questions;
+
+            // Validate the structure of each question
+            if (!generatedQuestions.every(q =>
+                typeof q.question === 'string' &&
+                Array.isArray(q.options) &&
+                q.options.every(o => typeof o === 'string') &&
+                typeof q.correct_answer === 'string'
+            )) {
+                throw new Error('Invalid question structure');
+            }
         } catch (error) {
             console.error('Error parsing generated questions:', error);
-            console.error('Raw function call arguments:', completion.choices[0].message.function_call.arguments);
+            console.error('Raw function call arguments:', completion.choices[0].message.function_call!.arguments);
             return NextResponse.json({ error: 'Failed to parse generated questions' }, { status: 500 });
         }
 
@@ -156,7 +174,7 @@ export async function POST(request: NextRequest) {
         console.log('Quiz created successfully:', quiz);
 
         // Insert questions for the quiz
-        const questionsToInsert = generatedQuestions.map((q: any) => ({
+        const questionsToInsert = generatedQuestions.map((q: GeneratedQuestion) => ({
             quiz_id: quiz.quiz_id,
             question_text: q.question,
             question_type: 'MCQ' // Assuming all generated questions are MCQs
@@ -177,10 +195,6 @@ export async function POST(request: NextRequest) {
         // Insert answers for each question
         const answersToInsert = insertedQuestions.flatMap((question: any, index: number) => {
             const currentQuestion = generatedQuestions[index];
-            if (!currentQuestion || !Array.isArray(currentQuestion.options)) {
-                console.error(`Invalid question or options at index ${index}`);
-                return [];
-            }
             return currentQuestion.options.map((option: string) => ({
                 question_id: question.question_id,
                 answer_text: option,
