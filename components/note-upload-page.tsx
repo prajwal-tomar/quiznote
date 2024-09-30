@@ -145,7 +145,7 @@ export function NoteUploadPageComponent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 to-purple-900 text-white font-sans">
-      <header className="bg-indigo-900 bg-opacity-50 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+      {/* <header className="bg-indigo-900 bg-opacity-50 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
         <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <Notebook className="w-8 h-8 text-green-400" />
@@ -164,7 +164,7 @@ export function NoteUploadPageComponent() {
             </Link>
           </div>
         </nav>
-      </header>
+      </header> */}
 
       <main className="container mx-auto px-4 pt-24 pb-12">
         <motion.h1

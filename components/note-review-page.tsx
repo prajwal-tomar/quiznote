@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Notebook, CheckSquare, ArrowRight } from 'lucide-react'
+import { Notebook, CheckSquare, ArrowRight, Loader } from 'lucide-react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 export function NoteReviewPageComponent() {
@@ -12,6 +12,7 @@ export function NoteReviewPageComponent() {
   const [noteTitle, setNoteTitle] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false)
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -48,11 +49,16 @@ export function NoteReviewPageComponent() {
 
   const handleGenerateQuiz = async () => {
     console.log('Generating quiz for noteId:', noteId);
+    setIsGeneratingQuiz(true)
+    setError(null)
+
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       console.error('No active session')
+      setIsGeneratingQuiz(false)
       return
     }
+
     try {
       const response = await fetch('/api/generate-quiz', {
         method: 'POST',
@@ -71,7 +77,7 @@ export function NoteReviewPageComponent() {
       const data = await response.json();
       console.log('Response data:', data);
 
-      if (!data.quiz.quiz_id) {
+      if (!data.quiz.quiz_id) { 
         throw new Error('Quiz ID not found in the response');
       }
 
@@ -84,6 +90,8 @@ export function NoteReviewPageComponent() {
         errorMessage += ` Error: ${error.message}`
       }
       setError(errorMessage)
+    } finally {
+      setIsGeneratingQuiz(false)
     }
   }
 
@@ -126,15 +134,37 @@ export function NoteReviewPageComponent() {
             </pre>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center text-lg"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-colors flex items-center text-lg mb-4"
               onClick={handleGenerateQuiz}
+              disabled={isGeneratingQuiz}
             >
-              Generate Quiz <ArrowRight className="ml-2 w-5 h-5" />
+              {isGeneratingQuiz ? (
+                <>
+                  Generating Quiz <Loader className="ml-2 w-5 h-5 animate-spin" />
+                </>
+              ) : (
+                <>
+                  Generate Quiz <ArrowRight className="ml-2 w-5 h-5" />
+                </>
+              )}
             </motion.button>
+
+            {isGeneratingQuiz && (
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 10 }}
+                className="w-64 h-2 bg-green-500 rounded-full mt-4"
+              />
+            )}
+
+            {error && (
+              <p className="text-red-500 mt-4">{error}</p>
+            )}
           </div>
         </motion.div>
       </main>

@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
+import { Notebook, CheckSquare, Check, X } from 'lucide-react'
 
 interface Question {
   question_id: number
@@ -28,6 +31,7 @@ export function QuizComponent({ quizId: initialQuizId }: QuizComponentProps) {
   const [quizCompleted, setQuizCompleted] = useState(false)
   const [quizResult, setQuizResult] = useState<any>(null)
   const [startTime, setStartTime] = useState<number | null>(null)
+  const [timeLeft, setTimeLeft] = useState(600) // 10 minutes in seconds
   const router = useRouter()
 
   const searchParams = useSearchParams()
@@ -98,6 +102,14 @@ export function QuizComponent({ quizId: initialQuizId }: QuizComponentProps) {
     fetchQuizQuestions()
   }, [quizId, supabaseClient])
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime > 0 ? prevTime - 1 : 0))
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
   const handleAnswerSelect = (answerId: number) => {
     setSelectedAnswer(answerId)
     setSelectedAnswers(prev => {
@@ -151,38 +163,98 @@ export function QuizComponent({ quizId: initialQuizId }: QuizComponentProps) {
     }
   }
 
-  if (isLoading) return <div>Loading quiz...</div>
-  if (error) return <div>Error: {error}</div>
-  if (questions.length === 0) return <div>No questions found for this quiz.</div>
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`
+  }
+
+  if (isLoading) return <div className="text-white">Loading quiz...</div>
+  if (error) return <div className="text-white">Error: {error}</div>
+  if (questions.length === 0) return <div className="text-white">No questions found for this quiz.</div>
 
   const currentQuestion = questions[currentQuestionIndex]
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Quiz</h1>
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <h2 className="text-xl mb-4">{currentQuestion.question_text}</h2>
-        <div className="space-y-2">
-          {currentQuestion.answers.map((answer) => (
-            <button
-              key={answer.answer_id}
-              className={`w-full text-left p-2 rounded ${
-                selectedAnswer === answer.answer_id ? 'bg-blue-500 text-white' : 'bg-gray-100'
-              }`}
-              onClick={() => handleAnswerSelect(answer.answer_id)}
+    <div className="min-h-screen bg-gradient-to-b from-indigo-900 to-purple-900 text-white font-sans">
+      <header className="bg-indigo-900 bg-opacity-50 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+        <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-2">
+            <Notebook className="w-8 h-8 text-green-400" />
+            <CheckSquare className="w-6 h-6 text-green-400 absolute ml-4 mt-4" />
+            <span className="text-2xl font-bold">QuizNote</span>
+          </Link>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm">Quiz in Progress</span>
+            <div className="w-32 h-2 bg-indigo-800 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-green-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <main className="container mx-auto px-4 pt-24 pb-12 flex">
+        <div className="w-3/4 pr-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentQuestion.question_id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="bg-indigo-800 bg-opacity-50 rounded-lg p-8 mb-8"
             >
-              {answer.answer_text}
-            </button>
-          ))}
+              <h2 className="text-2xl font-bold mb-4">{currentQuestion.question_text}</h2>
+              <div className="space-y-4">
+                {currentQuestion.answers.map((answer) => (
+                  <button
+                    key={answer.answer_id}
+                    onClick={() => handleAnswerSelect(answer.answer_id)}
+                    className={`w-full text-left p-4 rounded-lg transition-colors ${
+                      selectedAnswer === answer.answer_id
+                        ? 'bg-green-500 text-white'
+                        : 'bg-indigo-700 hover:bg-indigo-600'
+                    }`}
+                  >
+                    {answer.answer_text}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex justify-between">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={currentQuestionIndex === questions.length - 1 ? handleFinishQuiz : handleNextQuestion}
+              disabled={selectedAnswer === null}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {currentQuestionIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
+            </motion.button>
+          </div>
         </div>
-        <button
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={currentQuestionIndex === questions.length - 1 ? handleFinishQuiz : handleNextQuestion}
-          disabled={selectedAnswer === null}
-        >
-          {currentQuestionIndex === questions.length - 1 ? 'Finish Quiz' : 'Next Question'}
-        </button>
-      </div>
+
+        <div className="w-1/4 bg-indigo-800 bg-opacity-50 rounded-lg p-6">
+          <h3 className="text-xl font-bold mb-4">Progress</h3>
+          <p className="mb-2">Question {currentQuestionIndex + 1} of {questions.length}</p>
+          <p className="mb-4">Time Left: {formatTime(timeLeft)}</p>
+          <div className="w-full h-2 bg-indigo-700 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-green-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+        </div>
+      </main>
     </div>
   )
 }

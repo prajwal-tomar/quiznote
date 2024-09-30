@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google';
 import SupabaseProvider from '../components/supabase-provider';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { HeaderComponent } from "@/components/header";
 
 const poppins = Poppins({
     weight: ['400', '700'],
@@ -29,6 +30,7 @@ export default async function RootLayout({
         <html lang="en">
             <body className={poppins.variable}>
                 <SupabaseProvider session={session}>
+                <HeaderComponent />
                     {children}
                 </SupabaseProvider>
             </body>
