@@ -203,6 +203,10 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('Error generating quiz:', error);
-        return NextResponse.json({ error: 'Failed to generate quiz', details: error.message }, { status: 500 });
+        if (error instanceof Error) {
+            return NextResponse.json({ error: 'Failed to generate quiz', details: error.message }, { status: 500 });
+        } else {
+            return NextResponse.json({ error: 'Failed to generate quiz', details: 'An unknown error occurred' }, { status: 500 });
+        }
     }
 }

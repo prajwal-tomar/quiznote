@@ -87,9 +87,9 @@ export function QuizComponent({ quizId: initialQuizId }: QuizComponentProps) {
           // Set the start time when questions are loaded
           setStartTime(new Date().getTime())
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error fetching quiz questions:', err)
-        setError(`Failed to load quiz questions: ${err.message}`)
+        setError(`Failed to load quiz questions: ${err instanceof Error ? err.message : 'Unknown error'}`)
       } finally {
         setIsLoading(false)
       }
