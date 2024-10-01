@@ -120,7 +120,7 @@ function HeroSection() {
           <motion.div variants={variants}>
             <Link
               href="/upload"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors inline-block"
+              className="bg-green-400 hover:bg-green-500 text-indigo-900 font-bold py-3 px-8 rounded-full text-lg transition-colors inline-block"
             >
               Start Quiz-ing Now
             </Link>
@@ -233,7 +233,7 @@ function HowItWorksSection() {
     >
       <div className="container mx-auto px-4">
         <motion.h2
-          className="text-4xl font-bold text-center mb-12 text-white"
+          className="text-5xl font-bold text-center mb-12 text-white"
           variants={itemVariants}
         >
           How It Works
@@ -255,7 +255,7 @@ function HowItWorksSection() {
                 <step.icon className="w-10 h-10 text-white" />
               </motion.div>
               <h3 className="text-2xl font-semibold mb-2 text-white">{step.title}</h3>
-              <p className="text-indigo-200">{step.description}</p>
+              <p className="text-indigo-200 text-lg">{step.description}</p>
             </motion.div>
           ))}
         </div>
@@ -266,7 +266,7 @@ function HowItWorksSection() {
 
 function FeaturesSection() {
   const [ref, inView] = useInView({
-    triggerOnce: true,
+    triggerOnce: false, // Change this to false
     threshold: 0.1,
   })
 
@@ -276,6 +276,7 @@ function FeaturesSection() {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
+        when: "beforeChildren", // Ensure container animates before children
       },
     },
   }
@@ -307,13 +308,13 @@ function FeaturesSection() {
     <motion.section
       ref={ref}
       initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
+      animate={inView ? "visible" : "hidden"} // This will re-trigger animation when in view
       variants={containerVariants}
       className="py-20 bg-gradient-to-b from-purple-900 to-indigo-900"
     >
       <div className="container mx-auto px-4">
         <motion.h2
-          className="text-4xl font-bold text-center mb-12 text-white"
+          className="text-5xl font-bold text-center mb-12 text-white"
           variants={itemVariants}
         >
           Key Features
@@ -329,7 +330,7 @@ function FeaturesSection() {
             >
               <feature.icon className="w-12 h-12 text-green-400 mb-4" />
               <h3 className="text-2xl font-semibold mb-2 text-white">{feature.title}</h3>
-              <p className="text-indigo-200">{feature.description}</p>
+              <p className="text-indigo-200 text-lg">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -340,7 +341,7 @@ function FeaturesSection() {
 
 function BenefitsSection() {
   const [ref, inView] = useInView({
-    triggerOnce: true,
+    triggerOnce: false, // Change this to false
     threshold: 0.1,
   })
 
@@ -350,6 +351,7 @@ function BenefitsSection() {
       opacity: 1,
       transition: {
         staggerChildren: 0.2,
+        when: "beforeChildren", // Ensure container animates before children
       },
     },
   }
@@ -371,13 +373,13 @@ function BenefitsSection() {
     <motion.section
       ref={ref}
       initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
+      animate={inView ? "visible" : "hidden"} // This will re-trigger animation when in view
       variants={containerVariants}
       className="py-20 bg-gradient-to-b from-indigo-900 to-purple-900"
     >
       <div className="container mx-auto px-4">
         <motion.h2
-          className="text-4xl font-bold text-center mb-12 text-white"
+          className="text-5xl font-bold text-center mb-12 text-white"
           variants={itemVariants}
         >
           Benefits of Using QuizNote
@@ -389,8 +391,8 @@ function BenefitsSection() {
               className="flex items-center mb-6"
               variants={itemVariants}
             >
-              <CheckSquare className="w-6 h-6 text-green-400 mr-4 flex-shrink-0" />
-              <p className="text-lg text-white">{benefit}</p>
+              <CheckSquare className="w-8 h-8 text-green-400 mr-4 flex-shrink-0" />
+              <p className="text-xl text-white">{benefit}</p>
             </motion.div>
           ))}
         </div>
@@ -419,8 +421,8 @@ function CTASection() {
       className="py-20 bg-gradient-to-b from-purple-900 to-indigo-900"
     >
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold mb-6 text-white">Ready to Supercharge Your Learning?</h2>
-        <p className="text-xl mb-8 max-w-2xl mx-auto text-indigo-200">
+        <h2 className="text-5xl font-bold mb-6 text-white">Ready to Supercharge Your Learning?</h2>
+        <p className="text-2xl mb-8 max-w-2xl mx-auto text-indigo-200">
           Join thousands of students who are already using QuizNote to ace their exams and master their subjects.
         </p>
         <motion.div
@@ -429,12 +431,12 @@ function CTASection() {
         >
           <Link
             href="/sign-up"
-            className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg transition-colors inline-block"
+            className="bg-green-400 hover:bg-green-300 text-indigo-900 font-bold py-4 px-10 rounded-full text-xl transition-colors inline-block"
           >
             Get Started for Free
           </Link>
         </motion.div>
-        <p className="mt-4 text-indigo-300">No credit card required. Start quiz-ing in minutes.</p>
+        <p className="mt-4 text-indigo-300 text-lg">No credit card required. Start quiz-ing in minutes.</p>
       </div>
     </motion.section>
   )
