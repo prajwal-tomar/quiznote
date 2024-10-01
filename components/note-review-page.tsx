@@ -153,14 +153,16 @@ export function NoteReviewPageComponent() {
               )}
             </motion.button>
 
-            {isGeneratingQuiz && (
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 10 }}
-                className="w-64 h-2 bg-green-500 rounded-full mt-4"
-              />
-            )}
+            {/* {isGeneratingQuiz && (
+              <div className="w-64 h-2 bg-gray-300 rounded-full mt-4 overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: 15 }}
+                  className="h-full bg-green-500 rounded-full"
+                />
+              </div>
+            )} */}
 
             {error && (
               <p className="text-red-500 mt-4">{error}</p>

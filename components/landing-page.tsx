@@ -6,6 +6,8 @@ import { useInView } from 'react-intersection-observer'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Notebook, CheckSquare, Upload, BarChart2, Brain, Zap, Users } from 'lucide-react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
 
 export function LandingPageComponent() {
   const [isMounted, setIsMounted] = useState(false)
@@ -41,6 +43,27 @@ export function LandingPageComponent() {
 }
 
 function Header() {
+  const [user, setUser] = useState(null)
+  const supabase = createClientComponentClient()
+  const router = useRouter()
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+
+    fetchUser()
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [supabase])
+
   const navItems = [
     { name: 'Features', href: '#features' },
     { name: 'How It Works', href: '#how-it-works' },
@@ -71,10 +94,10 @@ function Header() {
           ))}
           <motion.li whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
             <Link
-              href="/sign-up"
+              href={user ? "/dashboard" : "/sign-up"}
               className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full text-sm transition-colors  "
             >
-              Get Started
+              {user ? "Dashboard" : "Get Started"}
             </Link>
           </motion.li>
         </ul>
@@ -119,7 +142,7 @@ function HeroSection() {
           </motion.p>
           <motion.div variants={variants}>
             <Link
-              href="/upload"
+              href="/dashboard"
               className="bg-green-400 hover:bg-green-500 text-indigo-900 font-bold py-3 px-8 rounded-full text-lg transition-colors inline-block"
             >
               Start Quiz-ing Now
