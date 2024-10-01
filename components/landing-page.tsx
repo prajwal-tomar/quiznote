@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { Notebook, CheckSquare, Upload, BarChart2, Brain, Zap, Users } from 'lucide-react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
+import { User } from '@supabase/supabase-js'
 
 export function LandingPageComponent() {
   const [isMounted, setIsMounted] = useState(false)
@@ -43,7 +44,7 @@ export function LandingPageComponent() {
 }
 
 function Header() {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const supabase = createClientComponentClient()
   const router = useRouter()
 
