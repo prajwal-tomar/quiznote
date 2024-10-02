@@ -1,23 +1,29 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+'use client'
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
-export function ProtectedRoute(WrappedComponent: React.ComponentType) {
-  return function ProtectedComponent(props: any) {
-    const router = useRouter();
-    const supabase = createClientComponentClient();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
 
-    useEffect(() => {
-      const checkAuth = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          router.push('/login');
-        }
-      };
+const supabase = createClientComponentClient()
 
-      checkAuth();
-    }, [router]);
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.push('/login');
+      } else {
+        setIsAuthenticated(true);
+      }
+    });
+  }, [router]);
 
-    return <WrappedComponent {...props} />;
-  };
+  if (!isAuthenticated) return null;
+
+  return <>{children}</>;
 }
