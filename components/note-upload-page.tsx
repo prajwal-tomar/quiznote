@@ -3,8 +3,7 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
-import Link from 'next/link'
-import { Notebook, CheckSquare, Upload, X } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
 

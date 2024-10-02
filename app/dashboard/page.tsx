@@ -3,6 +3,8 @@ import React from 'react'
 
 export default function DashboardPage() {
   return (
-    <div><NoteUploadPageComponent /></div>
+    <div>
+      <NoteUploadPageComponent />
+      </div>
   )
 }

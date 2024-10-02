@@ -127,7 +127,7 @@ function HeroSection() {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="min-h-screenflex items-center justify-center relative overflow-hidden pt-20  "
     >
-      <div className="py-20 container mx-auto px-4 flex flex-col lg:flex-row items-center">
+      <div className="py-32 container mx-auto px-4 flex flex-col lg:flex-row items-center">
         <div className="lg:w-1/2 text-center lg:text-left z-10 mb-12 lg:mb-0">
           <motion.h1
             className="text-4xl lg:text-6xl font-bold mb-6 text-white"

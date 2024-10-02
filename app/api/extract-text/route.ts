@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
     }
 
+    console.log(extractedText)
+
     return NextResponse.json({ extractedText });
   } catch (error) {
     console.error('Error in text extraction:', error);

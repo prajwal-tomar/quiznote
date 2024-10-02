@@ -26,14 +26,15 @@ export default function Login() {
 
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password,
-              })
-              if (error) throw error
-              
-              // Refresh the session
-              await supabase.auth.getSession()
-              router.push('/dashboard')
+                email,
+                password,
+            });
+            console.log('Sign-in response:', data);
+            if (error) throw error;
+            
+            console.log('Attempting to redirect...');
+            router.push('/dashboard');
+            console.log('Redirect called');
         } catch (error: unknown) {
             if (error instanceof Error) {
                 setError(error.message);
